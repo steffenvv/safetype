@@ -1,4 +1,4 @@
-import { aBoolean, aNumber, aString, aStringUnion, anObject } from "../validator";
+import { Validator, aBoolean, aNumber, aString, aStringUnion, anObject } from "../validator";
 
 interface Item {
     kind: "A" | "B" | "C" | undefined;
@@ -7,7 +7,7 @@ interface Item {
     enabled: boolean;
     maybeUndefined: string | undefined;
     subItems?: SubItem[];
-    /* nextItem: Item | null; */
+    nextItem?: Item;
 }
 
 interface SubItem {
@@ -16,7 +16,7 @@ interface SubItem {
     meta?: string | null;
 }
 
-const itemValidator = anObject({
+const itemValidator: Validator<Item> = anObject({
     kind: aStringUnion("A", "B", "C").orUndefined,
     name: aString,
     value: aString.orNull,
@@ -26,7 +26,8 @@ const itemValidator = anObject({
         name: aString,
         value: aNumber,
         meta: aString.orNull.orUndefined
-    }).array.orUndefined
+    }).array.orUndefined,
+    nextItem: () => itemValidator.orUndefined
 });
 
 const isValidItem = itemValidator.isValid;
@@ -44,6 +45,19 @@ describe("validation", () => {
                 value: null,
                 enabled: false,
                 subItems: [{ name: "", value: 42 }, { name: "" }]
+            })
+        ).toThrowErrorMatchingSnapshot();
+        expect(() =>
+            validateItem({
+                name: "a",
+                value: null,
+                enabled: true,
+                nextItem: {
+                    name: "b",
+                    value: null,
+                    enabled: true,
+                    nextItem: { name: "c", value: null, enabled: "error" }
+                }
             })
         ).toThrowErrorMatchingSnapshot();
     });

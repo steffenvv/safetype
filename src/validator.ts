@@ -128,7 +128,7 @@ export const aNumber = makeValidator(
     (x, context): number => (typeof x === "number" ? x : context.fail(`expected a number, not ${typeName(x)}`))
 );
 
-export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): Validator<T> {
+export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> | (() => Validator<T[K]>) }): Validator<T> {
     const validatorKeys = keys(validators);
 
     return makeValidator((x, context): T => {
@@ -141,7 +141,8 @@ export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): 
 
         for (const key of validatorKeys) {
             const value = x[key];
-            const validate = validators[key].validate;
+            const validator: Validator<any> | (() => Validator<any>) = validators[key];
+            const validate = typeof validator === "function" ? validator().validate : validator.validate;
 
             context.path.pushKey(key);
             try {
