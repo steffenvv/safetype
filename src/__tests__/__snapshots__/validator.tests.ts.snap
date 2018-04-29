@@ -1,5 +1,7 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`validation complains about extra properties 1`] = `"Validation error: unexpected property \\"foo\\""`;
+
 exports[`validation complains about missing properties 1`] = `"Validation error for key 'name': expected a string, not undefined"`;
 
 exports[`validation complains about missing properties 2`] = `"Validation error for key 'value': expected a string, not undefined"`;

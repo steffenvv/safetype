@@ -101,18 +101,16 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
                     context.fail(`expected an array, not ${typeName(x)}`);
                 }
 
-                const result: T[] = [];
-
                 for (let i = 0; i < x.length; i++) {
                     context.path.pushKey(i.toString());
                     try {
-                        result.push(validate(x[i], context));
+                        validate(x[i], context);
                     } finally {
                         context.path.popKey();
                     }
                 }
 
-                return result;
+                return x;
             });
         }
     };
@@ -134,11 +132,12 @@ export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): 
     const validatorKeys = keys(validators);
 
     return makeValidator((x, context): T => {
-        const result: any = {};
-
         if (x === null || typeof x !== "object") {
             context.fail(`expected an object, not ${typeName(x)}`);
         }
+
+        const result: any = {};
+        let changed = false;
 
         for (const key of validatorKeys) {
             const value = x[key];
@@ -151,13 +150,22 @@ export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): 
                     /* Don't introduce new keys for missing optional values. */
                 } else {
                     result[key] = validatedValue;
+                    changed = changed || validatedValue !== value;
                 }
             } finally {
                 context.path.popKey();
             }
         }
 
-        return result;
+        /* Check for extra keys */
+        for (const key of keys(x)) {
+            if (!validators.hasOwnProperty(key)) {
+                context.fail(`unexpected property "${key}"`);
+            }
+        }
+
+        /* Preserve the object identity if nothing changed. */
+        return changed ? result : x;
     });
 }
 

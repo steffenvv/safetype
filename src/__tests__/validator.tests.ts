@@ -1,6 +1,7 @@
 import { aBoolean, aNumber, aString, aStringUnion, anObject } from "../validator";
 
 interface Item {
+    kind: "A" | "B" | "C" | undefined;
     name: string;
     value: string | null;
     enabled: boolean;
@@ -57,8 +58,10 @@ describe("validation", () => {
         expect(validateItem({ name: "", value: null, enabled: true })).not.toHaveProperty("subItems");
     });
 
-    it("removes extra properties when validating", () => {
-        expect(validateItem({ name: "", value: null, enabled: false, foo: "bar" })).not.toHaveProperty("foo");
+    it("complains about extra properties", () => {
+        expect(() =>
+            validateItem({ name: "", value: null, enabled: false, foo: "bar" })
+        ).toThrowErrorMatchingSnapshot();
     });
 
     it("keeps undefined values when they are allowed", () => {
@@ -93,5 +96,17 @@ describe("validation", () => {
         test({ name: "b", value: null });
         test({ name: "b", value: null, enabled: true });
         test({ kind: "B", name: "b", value: null, enabled: true });
+    });
+
+    it("preserves object identities", () => {
+        const test = (v: Item) => {
+            expect(isValidItem(v)).toBe(true);
+            const v2 = validateItem(v);
+            expect(v2).toBe(v);
+            expect(v2.subItems).toBe(v.subItems);
+        };
+
+        test({ kind: "A", name: "a", value: "v", maybeUndefined: "", enabled: true });
+        test({ kind: "B", name: "b", value: null, maybeUndefined: undefined, enabled: false, subItems: [] });
     });
 });
