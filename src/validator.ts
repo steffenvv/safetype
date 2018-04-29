@@ -1,3 +1,7 @@
+/* TODO: deep required-ness */
+
+/* TODO: test that other properties are filtered out */
+
 export function keys<T>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
 }
@@ -80,7 +84,7 @@ export function _object<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): V
             context.path.pushKey(key);
             try {
                 const validatedValue = validator(value, context);
-                if (validatedValue === undefined && keys(x).indexOf(key) === -1) {
+                if (validatedValue === undefined && !x.hasOwnProperty(key)) {
                     /* Don't introduce new keys for missing optional values. */
                 } else {
                     result[key] = validatedValue;
@@ -94,12 +98,12 @@ export function _object<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): V
     };
 }
 
-export function validate<T>(value: any, validator: Validator<T>): T {
+export function makeContext(): ValidationContext {
     const path: string[] = [];
 
     const context: ValidationContext = {
-        fail(message: string): never {
-            const path = this.path.current();
+        fail: (message: string): never => {
+            const path = context.path.current();
             if (!path) {
                 throw new Error(`Validation error: ${message}`);
             } else {
@@ -116,7 +120,11 @@ export function validate<T>(value: any, validator: Validator<T>): T {
         }
     };
 
-    return validator(value, context);
+    return context;
+}
+
+export function validate<T>(value: any, validator: Validator<T>): T {
+    return validator(value, makeContext());
 }
 
 export function makeValidator<T>(validator: Validator<T>): (value: any) => T {
