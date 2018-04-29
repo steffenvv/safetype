@@ -1,4 +1,4 @@
-import { _array, _boolean, _nullable, _object, _optional, _string, makeTypeGuard, makeValidator } from "../validator";
+import { Validator, aBoolean, aString, anObject } from "../validator";
 
 interface Item {
     name: string;
@@ -15,25 +15,20 @@ interface SubItem {
     meta?: string | null;
 }
 
-const validateItem = makeValidator<Item>(
-    _object({
-        name: _string,
-        value: _nullable(_string),
-        enabled: _boolean,
-        maybeUndefined: _optional(_string),
-        subItems: _optional(
-            _array(
-                _object({
-                    name: _string,
-                    value: _string,
-                    meta: _optional(_nullable(_string))
-                })
-            )
-        )
-    })
-);
+const itemValidator: Validator<Item> = anObject({
+    name: aString,
+    value: aString.orNull,
+    enabled: aBoolean,
+    maybeUndefined: aString.orUndefined,
+    subItems: anObject({
+        name: aString,
+        value: aString,
+        meta: aString.orNull.orUndefined
+    }).array.orUndefined
+});
 
-const isValidItem = makeTypeGuard(validateItem);
+const isValidItem = itemValidator.isValid;
+const validateItem = itemValidator.validate;
 
 describe("validation", () => {
     it("complains about missing properties", () => {
