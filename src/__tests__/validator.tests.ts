@@ -55,6 +55,10 @@ describe("validation", () => {
         expect(validateItem({ name: "", value: null, enabled: true })).not.toHaveProperty("subItems");
     });
 
+    it("removes extra properties when validating", () => {
+        expect(validateItem({ name: "", value: null, enabled: false, foo: "bar" })).not.toHaveProperty("foo");
+    });
+
     it("keeps undefined values when they are allowed", () => {
         expect(validateItem({ name: "", value: null, enabled: false, maybeUndefined: undefined })).toHaveProperty(
             "maybeUndefined"

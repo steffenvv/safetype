@@ -1,7 +1,5 @@
 /* TODO: deep required-ness */
 
-/* TODO: test that other properties are filtered out */
-
 export function keys<T>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
 }
