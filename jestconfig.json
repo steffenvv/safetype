@@ -1,0 +1,12 @@
+{
+    "transform": {
+        "\\.tsx?": "./node_modules/ts-jest/preprocessor.js"
+    },
+    "moduleFileExtensions": ["ts", "tsx", "js", "jsx"],
+    "testRegex": "\\.tests?\\.tsx?$",
+    "moduleDirectories": ["node_modules"],
+    "modulePaths": ["./src"],
+    "cacheDirectory": "./.jestcache",
+    "transformIgnorePatterns": ["node_modules"],
+    "globals": { "ts-jest": { "tsConfigFile": "tsconfig.json" } }
+}

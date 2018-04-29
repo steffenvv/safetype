@@ -1,0 +1,56 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`validation complains about missing properties 1`] = `"Validation error for key 'name': expected a string, not undefined"`;
+
+exports[`validation complains about missing properties 2`] = `"Validation error for key 'value': expected a string, not undefined"`;
+
+exports[`validation complains about missing properties 3`] = `"Validation error for key 'value': expected a string, not undefined"`;
+
+exports[`validation complains about missing properties 4`] = `"Validation error for key 'enabled': expected a boolean, not undefined"`;
+
+exports[`validation complains about missing properties 5`] = `"Validation error for key 'subItems.1.value': expected a string, not undefined"`;
+
+exports[`validation does not complain about missing optional properties 1`] = `
+Object {
+  "enabled": false,
+  "name": "",
+  "value": null,
+}
+`;
+
+exports[`validation works as a type guard 1`] = `
+Object {
+  "valid": false,
+}
+`;
+
+exports[`validation works as a type guard 2`] = `
+Object {
+  "name": 3,
+  "valid": false,
+}
+`;
+
+exports[`validation works as a type guard 3`] = `
+Object {
+  "name": "a",
+  "valid": false,
+}
+`;
+
+exports[`validation works as a type guard 4`] = `
+Object {
+  "name": "b",
+  "valid": false,
+  "value": null,
+}
+`;
+
+exports[`validation works as a type guard 5`] = `
+Object {
+  "enabled": true,
+  "name": "b",
+  "valid": true,
+  "value": null,
+}
+`;
