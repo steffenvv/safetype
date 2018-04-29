@@ -18,6 +18,10 @@ exports[`validation complains about values with the wrong type 3`] = `"Validatio
 
 exports[`validation complains about values with the wrong type 4`] = `"Validation error for key 'value': expected a string, not an array"`;
 
+exports[`validation complains about values with the wrong type 5`] = `"Validation error for key 'kind': expected \\"A\\" | \\"B\\" | \\"C\\", not a string"`;
+
+exports[`validation complains about values with the wrong type 6`] = `"Validation error for key 'kind': expected \\"A\\" | \\"B\\" | \\"C\\", not a number"`;
+
 exports[`validation does not complain about missing optional properties 1`] = `
 Object {
   "enabled": false,
@@ -57,6 +61,16 @@ Object {
 exports[`validation works as a type guard 5`] = `
 Object {
   "enabled": true,
+  "name": "b",
+  "valid": true,
+  "value": null,
+}
+`;
+
+exports[`validation works as a type guard 6`] = `
+Object {
+  "enabled": true,
+  "kind": "B",
   "name": "b",
   "valid": true,
   "value": null,

@@ -1,4 +1,4 @@
-import { Validator, aBoolean, aNumber, aString, anObject } from "../validator";
+import { aBoolean, aNumber, aString, aStringUnion, anObject } from "../validator";
 
 interface Item {
     name: string;
@@ -15,7 +15,8 @@ interface SubItem {
     meta?: string | null;
 }
 
-const itemValidator: Validator<Item> = anObject({
+const itemValidator = anObject({
+    kind: aStringUnion("A", "B", "C").orUndefined,
     name: aString,
     value: aString.orNull,
     enabled: aBoolean,
@@ -51,6 +52,7 @@ describe("validation", () => {
     });
 
     it("does not insert undefined values for missing optional properties", () => {
+        expect(validateItem({ name: "", value: null, enabled: true })).not.toHaveProperty("kind");
         expect(validateItem({ name: "", value: null, enabled: true })).not.toHaveProperty("maybeUndefined");
         expect(validateItem({ name: "", value: null, enabled: true })).not.toHaveProperty("subItems");
     });
@@ -71,6 +73,8 @@ describe("validation", () => {
         expect(() => validateItem({ name: "42", value: true, enabled: false })).toThrowErrorMatchingSnapshot();
         expect(() => validateItem({ name: "42", value: null, enabled: "false" })).toThrowErrorMatchingSnapshot();
         expect(() => validateItem({ name: "42", value: [null], enabled: false })).toThrowErrorMatchingSnapshot();
+        expect(() => validateItem({ kind: "D", name: "", value: null, enabled: true })).toThrowErrorMatchingSnapshot();
+        expect(() => validateItem({ kind: 42, name: "", value: null, enabled: true })).toThrowErrorMatchingSnapshot();
     });
 
     it("works as a type guard", () => {
@@ -88,5 +92,6 @@ describe("validation", () => {
         test({ name: "a" });
         test({ name: "b", value: null });
         test({ name: "b", value: null, enabled: true });
+        test({ kind: "B", name: "b", value: null, enabled: true });
     });
 });

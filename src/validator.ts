@@ -1,5 +1,3 @@
-/* TODO: deep required-ness */
-
 export function keys<T>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
 }
@@ -160,5 +158,17 @@ export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): 
         }
 
         return result;
+    });
+}
+
+export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
+    const expectedType = values.map(x => `"${x}"`).join(" | ");
+
+    return makeValidator((x, context) => {
+        if (values.indexOf(x) === -1) {
+            context.fail(`expected ${expectedType}, not ${typeName(x)}`);
+        }
+
+        return x;
     });
 }
