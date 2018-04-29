@@ -8,7 +8,15 @@ exports[`validation complains about missing properties 3`] = `"Validation error 
 
 exports[`validation complains about missing properties 4`] = `"Validation error for key 'enabled': expected a boolean, not undefined"`;
 
-exports[`validation complains about missing properties 5`] = `"Validation error for key 'subItems.1.value': expected a string, not undefined"`;
+exports[`validation complains about missing properties 5`] = `"Validation error for key 'subItems.1.value': expected a number, not undefined"`;
+
+exports[`validation complains about values with the wrong type 1`] = `"Validation error for key 'name': expected a string, not a number"`;
+
+exports[`validation complains about values with the wrong type 2`] = `"Validation error for key 'value': expected a string, not a boolean"`;
+
+exports[`validation complains about values with the wrong type 3`] = `"Validation error for key 'enabled': expected a boolean, not a string"`;
+
+exports[`validation complains about values with the wrong type 4`] = `"Validation error for key 'value': expected a string, not an array"`;
 
 exports[`validation does not complain about missing optional properties 1`] = `
 Object {

@@ -1,4 +1,4 @@
-import { Validator, aBoolean, aString, anObject } from "../validator";
+import { Validator, aBoolean, aNumber, aString, anObject } from "../validator";
 
 interface Item {
     name: string;
@@ -11,7 +11,7 @@ interface Item {
 
 interface SubItem {
     name: string;
-    value: string;
+    value: number;
     meta?: string | null;
 }
 
@@ -22,7 +22,7 @@ const itemValidator: Validator<Item> = anObject({
     maybeUndefined: aString.orUndefined,
     subItems: anObject({
         name: aString,
-        value: aString,
+        value: aNumber,
         meta: aString.orNull.orUndefined
     }).array.orUndefined
 });
@@ -41,7 +41,7 @@ describe("validation", () => {
                 name: "name",
                 value: null,
                 enabled: false,
-                subItems: [{ name: "", value: "" }, { name: "" }]
+                subItems: [{ name: "", value: 42 }, { name: "" }]
             })
         ).toThrowErrorMatchingSnapshot();
     });
@@ -64,6 +64,13 @@ describe("validation", () => {
             "maybeUndefined"
         );
         expect(validateItem({ name: "", value: null, enabled: false, subItems: undefined })).toHaveProperty("subItems");
+    });
+
+    it("complains about values with the wrong type", () => {
+        expect(() => validateItem({ name: 42, value: null, enabled: false })).toThrowErrorMatchingSnapshot();
+        expect(() => validateItem({ name: "42", value: true, enabled: false })).toThrowErrorMatchingSnapshot();
+        expect(() => validateItem({ name: "42", value: null, enabled: "false" })).toThrowErrorMatchingSnapshot();
+        expect(() => validateItem({ name: "42", value: [null], enabled: false })).toThrowErrorMatchingSnapshot();
     });
 
     it("works as a type guard", () => {

@@ -48,6 +48,20 @@ export function makeContext(): ValidationContext {
     return context;
 }
 
+function typeName(x: any): string {
+    if (x === null) {
+        return "null";
+    } else if (x === undefined) {
+        return "undefined";
+    } else if (Array.isArray(x)) {
+        return "an array";
+    } else if (typeof x === "object") {
+        return "an object";
+    } else {
+        return `a ${typeof x}`;
+    }
+}
+
 export function makeValidator<T>(validate: (value: any, context: ValidationContext) => T): Validator<T> {
     return {
         validate: (x, context = makeContext()) => {
@@ -86,7 +100,7 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
         get array(): Validator<T[]> {
             return makeValidator((x, context): T[] => {
                 if (!Array.isArray(x)) {
-                    context.fail(`expected an array, not ${typeof x}`);
+                    context.fail(`expected an array, not ${typeName(x)}`);
                 }
 
                 const result: T[] = [];
@@ -107,15 +121,15 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
 }
 
 export const aString = makeValidator(
-    (x, context): string => (typeof x === "string" ? x : context.fail(`expected a string, not ${typeof x}`))
+    (x, context): string => (typeof x === "string" ? x : context.fail(`expected a string, not ${typeName(x)}`))
 );
 
 export const aBoolean = makeValidator(
-    (x, context): boolean => (typeof x === "boolean" ? x : context.fail(`expected a boolean, not ${typeof x}`))
+    (x, context): boolean => (typeof x === "boolean" ? x : context.fail(`expected a boolean, not ${typeName(x)}`))
 );
 
 export const aNumber = makeValidator(
-    (x, context): number => (typeof x === "number" ? x : context.fail(`expected a number, not ${typeof x}`))
+    (x, context): number => (typeof x === "number" ? x : context.fail(`expected a number, not ${typeName(x)}`))
 );
 
 export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): Validator<T> {
@@ -124,10 +138,8 @@ export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> }): 
     return makeValidator((x, context): T => {
         const result: any = {};
 
-        if (typeof x !== "object") {
-            context.fail(`expected an object, not ${typeof x}`);
-        } else if (x === null) {
-            context.fail("expected an object, not null");
+        if (x === null || typeof x !== "object") {
+            context.fail(`expected an object, not ${typeName(x)}`);
         }
 
         for (const key of validatorKeys) {
