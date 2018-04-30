@@ -1,6 +1,19 @@
 {
     "name": "safetype",
     "description": "Typescript library for typesafe creation of validation functions and type guards.",
+    "keywords": [
+        "typescript",
+        "ts",
+        "check",
+        "validate",
+        "validation",
+        "typeguard",
+        "type-guard",
+        "type guard",
+        "type checking",
+        "type safety",
+        "schema"
+    ],
     "version": "0.0.3",
     "license": "MIT",
     "publishConfig": {
