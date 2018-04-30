@@ -7,9 +7,9 @@ interface List {
     next: List | null;
 }
 
-const listValidator: Validator<List> = anObject({
+const aList: Validator<List> = anObject({
     value: aNumber,
-    next: () => listValidator.orNull
+    next: () => aList.orNull
 });
 
 const list: List = {
@@ -26,4 +26,4 @@ const list: List = {
     }
 };
 
-listValidator.validate(list);
+aList.validate(list);

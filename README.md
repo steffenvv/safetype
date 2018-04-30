@@ -34,7 +34,9 @@ if (aPerson.isValid(q)) {
 }
 ```
 
-Supports circular references between validators, using thunks:
+Validators can be self-referential to support linked data structures like lists
+and trees. To reference itself, a validator must use a thunk, i.e. a
+parameterless function, like so:
 
 ```typescript
 interface List {
@@ -42,9 +44,9 @@ interface List {
     next: List | null;
 }
 
-const listValidator: Validator<List> = anObject({
+const aList: Validator<List> = anObject({
     value: aNumber,
-    next: () => listValidator.orNull
+    next: () => aList.orNull
 });
 
 const list: List = {
@@ -61,8 +63,11 @@ const list: List = {
     }
 };
 
-listValidator.validate(list);
+aList.validate(list);
 ```
+
+NOTE: There is currently no detection of cycles, so if you try to validate e.g.
+a circularly linked list, the validation code will recurse infinitely.
 
 If you really want to, it's also easy to create your own validators:
 
