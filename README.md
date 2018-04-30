@@ -16,6 +16,7 @@ const personValidator = anObject({
     phones: phoneValidator.array.orUndefined
 });
 
+/* Derive the Person type from its validation code, to keep them in sync. */
 type Person = ReturnType<typeof personValidator.validate>;
 
 const p: Person = {
