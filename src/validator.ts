@@ -7,6 +7,7 @@ export interface PathContext {
 export interface ValidationContext {
     fail(message: string): never;
     path: PathContext;
+    typeName(value: any): string;
 }
 
 export interface Validator<T> {
@@ -22,7 +23,7 @@ export function keys<T>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
 }
 
-export function typeName(x: any): string {
+function typeName(x: any): string {
     if (x === null) {
         return "null";
     } else if (x === undefined) {
@@ -55,7 +56,9 @@ export function makeContext(): ValidationContext {
             popKey: () => path.pop(),
 
             current: () => path.join(".")
-        }
+        },
+
+        typeName
     };
 
     return context;
