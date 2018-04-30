@@ -102,16 +102,23 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
                     context.fail(`expected an array, not ${typeName(x)}`);
                 }
 
+                const result: T[] = [];
+                let changed = false;
+
                 for (let i = 0; i < x.length; i++) {
                     context.path.pushKey(i.toString());
                     try {
-                        validate(x[i], context);
+                        const value = x[i];
+                        const validatedValue = validate(value, context);
+                        result.push(validatedValue);
+                        changed = changed || value !== validatedValue;
                     } finally {
                         context.path.popKey();
                     }
                 }
 
-                return x;
+                /* Preserve the object identity if nothing changed. */
+                return changed ? result : x;
             });
         },
 
