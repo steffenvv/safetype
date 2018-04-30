@@ -9,7 +9,7 @@ interface List {
 
 const aList: Validator<List> = anObject({
     value: aNumber,
-    next: () => aList.orNull
+    next: () => aList.orNull /* self-reference */
 });
 
 const list: List = {

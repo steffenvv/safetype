@@ -191,6 +191,10 @@ export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> | ((
     });
 }
 
+export function aStringLiteral<T extends string>(value: T): Validator<T> {
+    return aStringUnion(value);
+}
+
 export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
     const expectedType = values.map(x => `"${x}"`).join(" | ");
 

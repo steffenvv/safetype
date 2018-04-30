@@ -34,6 +34,37 @@ if (aPerson.isValid(q)) {
 }
 ```
 
+All of the basic types are supported, and validators can be composed to form
+more complex types. Here is an example that creates a tagged union:
+
+```typescript
+const anOutcome = anObject({
+    kind: aStringLiteral("Success"),
+    data: aString.array,
+    timestamp: aNumber
+}).or(
+    anObject({
+        kind: aStringLiteral("Error"),
+        error: aString
+    })
+);
+
+type Outcome = ReturnType<typeof anOutcome.validate>;
+
+/* Inferred type:
+
+type Outcome = {
+    kind: "Success";
+    data: string[];
+    timestamp: number;
+} | {
+    kind: "Error";
+    error: string;
+}
+
+*/
+```
+
 Validators can be self-referential to support linked data structures like lists
 and trees. To reference itself, a validator must use a thunk, i.e. a
 parameterless function, like so:
@@ -46,7 +77,7 @@ interface List {
 
 const aList: Validator<List> = anObject({
     value: aNumber,
-    next: () => aList.orNull
+    next: () => aList.orNull /* self-reference */
 });
 
 const list: List = {
