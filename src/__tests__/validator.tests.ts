@@ -123,4 +123,19 @@ describe("validation", () => {
         test({ kind: "A", name: "a", value: "v", maybeUndefined: "", enabled: true });
         test({ kind: "B", name: "b", value: null, maybeUndefined: undefined, enabled: false, subItems: [] });
     });
+
+    it("works with union types", () => {
+        const union = aString.or(aBoolean).or(aNumber.array);
+
+        expect(union.isValid("a")).toBe(true);
+        expect(union.isValid(true)).toBe(true);
+        expect(union.isValid([])).toBe(true);
+        expect(union.isValid([1, 2, 3])).toBe(true);
+
+        expect(() => union.validate(42)).toThrowErrorMatchingSnapshot();
+        expect(() => union.validate([[42]])).toThrowErrorMatchingSnapshot();
+        expect(() => union.validate(["42"])).toThrowErrorMatchingSnapshot();
+        expect(() => union.validate(null)).toThrowErrorMatchingSnapshot();
+        expect(() => union.validate(undefined)).toThrowErrorMatchingSnapshot();
+    });
 });

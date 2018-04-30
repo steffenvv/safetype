@@ -80,3 +80,13 @@ Object {
   "value": null,
 }
 `;
+
+exports[`validation works with union types 1`] = `"Validation error: expected an array, not a number"`;
+
+exports[`validation works with union types 2`] = `"Validation error for key '0': expected a number, not an array"`;
+
+exports[`validation works with union types 3`] = `"Validation error for key '0': expected a number, not a string"`;
+
+exports[`validation works with union types 4`] = `"Validation error: expected an array, not null"`;
+
+exports[`validation works with union types 5`] = `"Validation error: expected an array, not undefined"`;
