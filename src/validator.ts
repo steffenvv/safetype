@@ -1,7 +1,3 @@
-export function keys<T>(obj: T): (keyof T)[] {
-    return Object.keys(obj) as (keyof T)[];
-}
-
 export interface PathContext {
     pushKey(key: string): void;
     popKey(): void;
@@ -19,6 +15,24 @@ export interface Validator<T> {
     orNull: Validator<T | null>;
     orUndefined: Validator<T | undefined>;
     array: Validator<T[]>;
+}
+
+export function keys<T>(obj: T): (keyof T)[] {
+    return Object.keys(obj) as (keyof T)[];
+}
+
+export function typeName(x: any): string {
+    if (x === null) {
+        return "null";
+    } else if (x === undefined) {
+        return "undefined";
+    } else if (Array.isArray(x)) {
+        return "an array";
+    } else if (typeof x === "object") {
+        return "an object";
+    } else {
+        return `a ${typeof x}`;
+    }
 }
 
 export function makeContext(): ValidationContext {
@@ -44,20 +58,6 @@ export function makeContext(): ValidationContext {
     };
 
     return context;
-}
-
-function typeName(x: any): string {
-    if (x === null) {
-        return "null";
-    } else if (x === undefined) {
-        return "undefined";
-    } else if (Array.isArray(x)) {
-        return "an array";
-    } else if (typeof x === "object") {
-        return "an object";
-    } else {
-        return `a ${typeof x}`;
-    }
 }
 
 export function makeValidator<T>(validate: (value: any, context: ValidationContext) => T): Validator<T> {
