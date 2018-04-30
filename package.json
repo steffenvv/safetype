@@ -1,7 +1,7 @@
 {
     "name": "safetype",
     "description": "Typescript library for typesafe creation of validation functions and type guards.",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "license": "MIT",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
