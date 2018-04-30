@@ -12,7 +12,7 @@ interface Item {
 
 interface SubItem {
     name: string;
-    value: number;
+    value: boolean | number | string;
     meta?: string | null;
 }
 
@@ -24,7 +24,7 @@ const itemValidator: Validator<Item> = anObject({
     maybeUndefined: aString.orUndefined,
     subItems: anObject({
         name: aString,
-        value: aNumber,
+        value: aBoolean.or(aNumber).or(aString),
         meta: aString.orNull.orUndefined
     }).array.orUndefined,
     nextItem: () => itemValidator.orUndefined

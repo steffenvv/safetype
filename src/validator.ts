@@ -15,6 +15,7 @@ export interface Validator<T> {
     orNull: Validator<T | null>;
     orUndefined: Validator<T | undefined>;
     array: Validator<T[]>;
+    or<U>(otherValidator: Validator<U>): Validator<T | U>;
 }
 
 export function keys<T>(obj: T): (keyof T)[] {
@@ -111,6 +112,16 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
                 }
 
                 return x;
+            });
+        },
+
+        or<U>(otherValidator: Validator<U>): Validator<T | U> {
+            return makeValidator((x, context): T | U => {
+                try {
+                    return validate(x, context);
+                } catch {
+                    return otherValidator.validate(x, context);
+                }
             });
         }
     };
