@@ -12,7 +12,7 @@ const aPerson = anObject({
     phones: aPhone.array.orUndefined
 });
 
-/* Derive the Person type from its validation code. */
+/* Infer the Person type from its validation code. */
 type Person = ReturnType<typeof aPerson.validate>;
 
 const p: Person = {

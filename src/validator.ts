@@ -165,7 +165,7 @@ export type RequiredKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
 
 export type UndefinedToOptional<T> = OptionalKeys<T> extends never
     ? T
-    : { [K in OptionalKeys<T>]?: T[K] | undefined } & { [K in RequiredKeys<T>]: T[K] };
+    : { [K in RequiredKeys<T>]: T[K] } & { [K in OptionalKeys<T>]?: T[K] | undefined };
 
 export type Validated<T> = { readonly [K in keyof UndefinedToOptional<T>]: UndefinedToOptional<T>[K] };
 

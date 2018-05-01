@@ -20,7 +20,7 @@ const aPerson = anObject({
     phones: aPhone.array.orUndefined
 });
 
-/* Derive the Person type from its validation code. */
+/* Infer the Person type from its validation code. */
 type Person = ReturnType<typeof aPerson.validate>;
 
 const p: Person = {
@@ -49,7 +49,8 @@ const anOutcome = anObject({
 }).or(
     anObject({
         kind: aStringLiteral("Error"),
-        error: aString
+        error: aString,
+        stackTrace: aString.orUndefined
     })
 );
 
@@ -63,9 +64,16 @@ type Outcome = {
 } | {
     readonly kind: "Error";
     readonly error: string;
+    readonly stackTrace?: string | undefined;
 }
 */
 ```
+
+Properties that may be undefined can be declared using `.orUndefined`, and will
+become optional properties in the inferred type. If you want a required
+property, consider using `.orNull` instead of `.orUndefined`, and let `null`
+signal the absence of a value. Using `null` instead of `undefined` also has the
+advantage of surviving JSON serialization and deserialization.
 
 Validators can be self-referential to support linked data structures like lists
 and trees. To reference itself, a validator must use a thunk, i.e. a
@@ -99,10 +107,16 @@ const list: List = {
 aList.validate(list);
 ```
 
-NOTE: There is currently no detection of cycles, so if you try to validate e.g.
-a circularly linked list, the validation code will recurse infinitely.
+Unfortunately, typescript cannot infer the type of a self-referencing
+initializer, so if you need to use this mechanism, you must declare the model
+type manually. Also, there is currently no detection of cycles, so if you try to
+validate e.g. a circularly linked list, the validation code will recurse
+infinitely. In practice, such situations should be rare; for example, any JSON
+data will be acyclic by nature.
 
-If you really want to, it's also easy to create your own validators:
+If you really want to, it's also easy to create your own validators. Use the
+`makeValidator` function as in the example below. Custom validators can be
+combined in the usual way.
 
 ```typescript
 class Hex {
@@ -122,4 +136,8 @@ const aHexString = makeValidator((value, context) => {
 if (aHexString.isValid("Bad")) {
     console.log("Good!");
 }
+
+const aResponse = anObject({
+    data: aHexString.array.orNull
+});
 ```

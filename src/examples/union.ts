@@ -9,7 +9,8 @@ const anOutcome = anObject({
 }).or(
     anObject({
         kind: aStringLiteral("Error"),
-        error: aString
+        error: aString,
+        stackTrace: aString.orUndefined
     })
 );
 
@@ -23,5 +24,6 @@ type Outcome = {
 } | {
     readonly kind: "Error";
     readonly error: string;
+    readonly stackTrace?: string | undefined;
 }
 */

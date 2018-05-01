@@ -1,4 +1,4 @@
-import { makeValidator } from "..";
+import { makeValidator, anObject } from "..";
 
 // Custom validator example
 
@@ -17,3 +17,7 @@ const aHexString = makeValidator((value, context) => {
 if (aHexString.isValid("Bad")) {
     console.log("Good!");
 }
+
+const aResponse = anObject({
+    data: aHexString.array.orNull /* Custom validators can be combined in the usual way */
+});
