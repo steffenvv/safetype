@@ -6,16 +6,16 @@ export interface PathContext {
 
 export interface ValidationContext {
     fail(message: string): never;
-    path: PathContext;
+    readonly path: PathContext;
     typeName(value: any): string;
 }
 
 export interface Validator<T> {
     validate(value: any, context?: ValidationContext): T;
     isValid(value: any): value is T;
-    orNull: Validator<T | null>;
-    orUndefined: Validator<T | undefined>;
-    array: Validator<T[]>;
+    readonly orNull: Validator<T | null>;
+    readonly orUndefined: Validator<T | undefined>;
+    readonly array: Validator<ReadonlyArray<T>>;
     or<U>(otherValidator: Validator<U>): Validator<T | U>;
 }
 
@@ -99,8 +99,8 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
             });
         },
 
-        get array(): Validator<T[]> {
-            return makeValidator((x, context): T[] => {
+        get array(): Validator<ReadonlyArray<T>> {
+            return makeValidator((x, context): ReadonlyArray<T> => {
                 if (!Array.isArray(x)) {
                     context.fail(`expected an array, not ${typeName(x)}`);
                 }
@@ -149,10 +149,30 @@ export const aNumber = makeValidator(
     (x, context): number => (typeof x === "number" ? x : context.fail(`expected a number, not ${typeName(x)}`))
 );
 
-export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> | (() => Validator<T[K]>) }): Validator<T> {
+export type ThunkValidator<T> = Validator<T> | (() => Validator<T>);
+
+export type ValidatorMap<T> = { [K in keyof T]: ThunkValidator<T[K]> };
+
+export type ExtendsUndefined<T> = T extends undefined ? true : false;
+
+export type CanBeUndefined<T> = ExtendsUndefined<T> extends false ? false : true;
+
+export type Omit<T, K> = Pick<T, Exclude<keyof T, K>>;
+
+export type OptionalKeys<T> = { [K in keyof T]: CanBeUndefined<T[K]> extends true ? K : never }[keyof T];
+
+export type RequiredKeys<T> = Exclude<keyof T, OptionalKeys<T>>;
+
+export type UndefinedToOptional<T> = OptionalKeys<T> extends never
+    ? T
+    : { [K in OptionalKeys<T>]?: T[K] | undefined } & { [K in RequiredKeys<T>]: T[K] };
+
+export type Validated<T> = { readonly [K in keyof UndefinedToOptional<T>]: UndefinedToOptional<T>[K] };
+
+export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>> {
     const validatorKeys = keys(validators);
 
-    return makeValidator((x, context): T => {
+    return makeValidator((x, context): Validated<T> => {
         if (x === null || typeof x !== "object") {
             context.fail(`expected an object, not ${typeName(x)}`);
         }
@@ -162,7 +182,7 @@ export function anObject<T>(validators: { [K in keyof T]-?: Validator<T[K]> | ((
 
         for (const key of validatorKeys) {
             const value = x[key];
-            const validator: Validator<any> | (() => Validator<any>) = validators[key];
+            const validator: ThunkValidator<any> = validators[key];
             const validate = typeof validator === "function" ? validator().validate : validator.validate;
 
             context.path.pushKey(key);

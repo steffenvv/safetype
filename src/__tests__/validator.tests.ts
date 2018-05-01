@@ -1,19 +1,19 @@
 import { Validator, aBoolean, aNumber, aString, aStringUnion, anObject } from "../validator";
 
 interface Item {
-    kind: "A" | "B" | "C" | undefined;
-    name: string;
-    value: string | null;
-    enabled: boolean;
-    maybeUndefined: string | undefined;
-    subItems?: SubItem[];
-    nextItem?: Item;
+    readonly kind?: "A" | "B" | "C";
+    readonly name: string;
+    readonly value: string | null;
+    readonly enabled: boolean;
+    readonly maybeUndefined?: string | undefined;
+    readonly subItems?: ReadonlyArray<SubItem>;
+    readonly nextItem?: Item;
 }
 
 interface SubItem {
-    name: string;
-    value: boolean | number | string;
-    meta?: string | null;
+    readonly name: string;
+    readonly value: boolean | number | string;
+    readonly meta?: string | null;
 }
 
 const itemValidator: Validator<Item> = anObject({

@@ -1,9 +1,13 @@
 # safetype
 
-Typescript library for typesafe creation of validation functions and type
-guards.
+This is a typescript library for typesafe creation of validation functions and
+type guards. The key idea is to write your validation code as the source of
+truth, and infer your model types from the validation code. This ensures that
+the two are always in sync; it's not possible to change the model type and
+forget to update the validation code.
 
-Declare validators using a fluent interface:
+Your model types are described by declaring _validators_ using a fluent
+interface:
 
 ```typescript
 const aPhone = anObject({
@@ -16,7 +20,7 @@ const aPerson = anObject({
     phones: aPhone.array.orUndefined
 });
 
-/* Derive the Person type from its validation code, to keep them in sync. */
+/* Derive the Person type from its validation code. */
 type Person = ReturnType<typeof aPerson.validate>;
 
 const p: Person = {
@@ -24,12 +28,12 @@ const p: Person = {
     phones: [{ phoneNumber: "123", phoneType: "Mobile" }]
 };
 
-aPerson.validate(p); /* Throws if p is not a Person */
+aPerson.validate(p); /* Throws if p is not a Person. */
 
 const q = JSON.parse(JSON.stringify(p));
 
 if (aPerson.isValid(q)) {
-    /* Validates that q is a Person and narrows its type from any to Person */
+    /* Validates that q is a Person and narrows its type from any to Person. */
     console.log(`Hello, ${q.name}`);
 }
 ```
@@ -52,16 +56,14 @@ const anOutcome = anObject({
 type Outcome = ReturnType<typeof anOutcome.validate>;
 
 /* Inferred type:
-
 type Outcome = {
-    kind: "Success";
-    data: string[];
-    timestamp: number;
+    readonly kind: "Success";
+    readonly data: ReadonlyArray<string>;
+    readonly timestamp: number;
 } | {
-    kind: "Error";
-    error: string;
+    readonly kind: "Error";
+    readonly error: string;
 }
-
 */
 ```
 

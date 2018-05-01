@@ -12,7 +12,7 @@ const aPerson = anObject({
     phones: aPhone.array.orUndefined
 });
 
-/* Derive the Person type from its validation code, to keep them in sync. */
+/* Derive the Person type from its validation code. */
 type Person = ReturnType<typeof aPerson.validate>;
 
 const p: Person = {
@@ -20,11 +20,11 @@ const p: Person = {
     phones: [{ phoneNumber: "123", phoneType: "Mobile" }]
 };
 
-aPerson.validate(p); /* Throws if p is not a Person */
+aPerson.validate(p); /* Throws if p is not a Person. */
 
 const q = JSON.parse(JSON.stringify(p));
 
 if (aPerson.isValid(q)) {
-    /* Validates that q is a Person and narrows its type from any to Person */
+    /* Validates that q is a Person and narrows its type from any to Person. */
     console.log(`Hello, ${q.name}`);
 }

@@ -16,14 +16,12 @@ const anOutcome = anObject({
 type Outcome = ReturnType<typeof anOutcome.validate>;
 
 /* Inferred type:
-
 type Outcome = {
-    kind: "Success";
-    data: string[];
-    timestamp: number;
+    readonly kind: "Success";
+    readonly data: ReadonlyArray<string>;
+    readonly timestamp: number;
 } | {
-    kind: "Error";
-    error: string;
+    readonly kind: "Error";
+    readonly error: string;
 }
-
 */
