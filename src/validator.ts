@@ -226,3 +226,5 @@ export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
         return x;
     });
 }
+
+export type InferType<T extends Validator<any>> = T extends Validator<infer U> ? U : never;

@@ -1,4 +1,4 @@
-import { aNumber, aString, aStringLiteral, anObject } from "..";
+import { InferType, aNumber, aString, aStringLiteral, anObject } from "..";
 
 // Union example
 
@@ -14,7 +14,7 @@ const anOutcome = anObject({
     })
 );
 
-type Outcome = ReturnType<typeof anOutcome.validate>;
+type Outcome = InferType<typeof anOutcome>;
 
 /* Inferred type:
 type Outcome = {

@@ -1,4 +1,4 @@
-import { aString, aStringUnion, anObject } from "..";
+import { InferType, aString, aStringUnion, anObject } from "..";
 
 // Person example
 
@@ -13,7 +13,7 @@ const aPerson = anObject({
 });
 
 /* Infer the Person type from its validation code. */
-type Person = ReturnType<typeof aPerson.validate>;
+type Person = InferType<typeof aPerson>;
 
 const p: Person = {
     name: "Bob",

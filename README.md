@@ -21,7 +21,7 @@ const aPerson = anObject({
 });
 
 /* Infer the Person type from its validation code. */
-type Person = ReturnType<typeof aPerson.validate>;
+type Person = InferType<typeof aPerson>;
 
 const p: Person = {
     name: "Bob",
@@ -54,7 +54,7 @@ const anOutcome = anObject({
     })
 );
 
-type Outcome = ReturnType<typeof anOutcome.validate>;
+type Outcome = InferType<typeof anOutcome>;
 
 /* Inferred type:
 type Outcome = {
