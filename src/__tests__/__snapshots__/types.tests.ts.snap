@@ -1,0 +1,45 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`type inference works correctly for basic types 1`] = `
+Object {
+  "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
+export { Validated, Validator };
+export declare const t1: Validator<string>;
+export declare type T1 = InferType<typeof t1>;
+",
+  "errors": Array [],
+  "jsOutput": "",
+}
+`;
+
+exports[`type inference works correctly for shallow object types 1`] = `
+Object {
+  "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
+export { Validated, Validator };
+export declare const t1: Validator<Validated<{
+    foo: string;
+    bar: number;
+    baz: boolean;
+}>>;
+export declare type T1 = InferType<typeof t1>;
+",
+  "errors": Array [],
+  "jsOutput": "",
+}
+`;
+
+exports[`type inference works correctly for shallow object types with arrays and optionals 1`] = `
+Object {
+  "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
+export { Validated, Validator };
+export declare const t1: Validator<Validated<{
+    foo: ReadonlyArray<string | null> | null | undefined;
+    bar: number | null;
+    baz: boolean | undefined;
+}>>;
+export declare type T1 = InferType<typeof t1>;
+",
+  "errors": Array [],
+  "jsOutput": "",
+}
+`;
