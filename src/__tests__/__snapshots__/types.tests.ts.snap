@@ -12,6 +12,30 @@ export declare type T1 = InferType<typeof t1>;
 }
 `;
 
+exports[`type inference works correctly for nested object types 1`] = `
+Object {
+  "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
+export { Validated, Validator };
+export declare const t1: Validator<Validated<{
+    foo: ReadonlyArray<string | null> | null | undefined;
+    bar: number | null;
+    baz: boolean | undefined;
+}>>;
+export declare const t2: Validator<Validated<{
+    a: Validated<{
+        foo: ReadonlyArray<string | null> | null | undefined;
+        bar: number | null;
+        baz: boolean | undefined;
+    }>;
+}>>;
+export declare type T1 = InferType<typeof t1>;
+export declare type T2 = InferType<typeof t2>;
+",
+  "errors": Array [],
+  "jsOutput": "",
+}
+`;
+
 exports[`type inference works correctly for shallow object types 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";

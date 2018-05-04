@@ -110,4 +110,22 @@ describe("type inference", () => {
         ].join("\n");
         expect(compileModule(sourceCode)).toMatchSnapshot();
     });
+
+    it("works correctly for nested object types", () => {
+        const sourceCode = [
+            ...commonSourceCode,
+            `import { anObject, aString, aNumber, aBoolean } from ".";
+             export const t1 = anObject({
+                 foo: aString.orNull.array.orNull.orUndefined,
+                 bar: aNumber.orNull,
+                 baz: aBoolean.orUndefined
+             });
+             export const t2 = anObject({
+                 a: t1,
+             });
+             export type T1 = InferType<typeof t1>;
+             export type T2 = InferType<typeof t2>;`
+        ].join("\n");
+        expect(compileModule(sourceCode)).toMatchSnapshot();
+    });
 });
