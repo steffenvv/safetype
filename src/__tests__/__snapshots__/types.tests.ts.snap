@@ -67,3 +67,23 @@ export declare type T1 = InferType<typeof t1>;
   "jsOutput": "",
 }
 `;
+
+exports[`type inference works correctly for unions 1`] = `
+Object {
+  "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
+export { Validated, Validator };
+export declare const anOutcome: Validator<Validated<{
+    kind: \\"Success\\";
+    data: ReadonlyArray<string>;
+    timestamp: number;
+}> | Validated<{
+    kind: \\"Error\\";
+    error: string;
+    stackTrace: string | undefined;
+}>>;
+export declare type Outcome = InferType<typeof anOutcome>;
+",
+  "errors": Array [],
+  "jsOutput": "",
+}
+`;
