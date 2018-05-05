@@ -102,7 +102,7 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
         get array(): Validator<ReadonlyArray<T>> {
             return makeValidator((x, context): ReadonlyArray<T> => {
                 if (!Array.isArray(x)) {
-                    context.fail(`expected an array, not ${typeName(x)}`);
+                    return context.fail(`expected an array, not ${typeName(x)}`);
                 }
 
                 const result: T[] = [];
@@ -174,7 +174,7 @@ export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>
 
     return makeValidator((x, context): Validated<T> => {
         if (x === null || typeof x !== "object") {
-            context.fail(`expected an object, not ${typeName(x)}`);
+            return context.fail(`expected an object, not ${typeName(x)}`);
         }
 
         const result: any = {};
@@ -202,7 +202,7 @@ export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>
         /* Check for extra keys */
         for (const key of keys(x)) {
             if (!validators.hasOwnProperty(key)) {
-                context.fail(`unexpected property "${key}"`);
+                return context.fail(`unexpected property "${key}"`);
             }
         }
 
@@ -220,7 +220,7 @@ export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
 
     return makeValidator((x, context) => {
         if (values.indexOf(x) === -1) {
-            context.fail(`expected ${expectedType}, not ${typeName(x)}`);
+            return context.fail(`expected ${expectedType}, not ${typeName(x)}`);
         }
 
         return x;

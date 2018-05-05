@@ -125,7 +125,7 @@ class Hex {
 
 const aHexString = makeValidator((value, context) => {
     if (typeof value !== "string" || !value.match(/^[0-9A-Fa-f]+$/)) {
-        context.fail(
+        return context.fail(
             `expected a string of hex digits, not ${context.typeName(value)}`
         );
     }
