@@ -181,6 +181,10 @@ export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>
         let changed = false;
 
         for (const key of validatorKeys) {
+            if (typeof key !== "string") {
+                continue;
+            }
+
             const value = x[key];
             const validator: ThunkValidator<any> = validators[key];
             const validate = typeof validator === "function" ? validator().validate : validator.validate;
@@ -201,7 +205,7 @@ export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>
 
         /* Check for extra keys */
         for (const key of keys(x)) {
-            if (!validators.hasOwnProperty(key)) {
+            if (typeof key === "string" && !validators.hasOwnProperty(key)) {
                 return context.fail(`unexpected property "${key}"`);
             }
         }
