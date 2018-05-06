@@ -23,9 +23,9 @@ export declare const t1: Validator<Validated<{
 }>>;
 export declare const t2: Validator<Validated<{
     a: Validated<{
-        foo: ReadonlyArray<string | null> | null | undefined;
-        bar: number | null;
-        baz: boolean | undefined;
+        foo: any;
+        bar: any;
+        baz: any;
     }>;
 }>>;
 export declare type T1 = InferType<typeof t1>;

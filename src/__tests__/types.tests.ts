@@ -112,6 +112,11 @@ describe("type inference", () => {
     });
 
     it("works correctly for nested object types", () => {
+        /* Note: the output .d.ts files will use the type any here for foo, bar,
+         * and baz, due to a design limitation in typescript's typeToString
+         * function: https://github.com/Microsoft/TypeScript/issues/23918
+         */
+
         const sourceCode = [
             ...commonSourceCode,
             `import { anObject, aString, aNumber, aBoolean } from ".";
