@@ -14,7 +14,7 @@
         "type safety",
         "schema"
     ],
-    "version": "0.0.6",
+    "version": "0.0.7",
     "license": "MIT",
     "publishConfig": {
         "registry": "https://registry.npmjs.org/"
