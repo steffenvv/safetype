@@ -39,9 +39,9 @@ function compileModule(sourceCode: string): CompilationResult {
     const writeFile: ts.WriteFileCallback = (
         fileName: string,
         data: string,
-        writeByteOrderMark: boolean,
-        onError: ((message: string) => void) | undefined,
-        sourceFiles: ReadonlyArray<ts.SourceFile>
+        _writeByteOrderMark: boolean,
+        _onError: ((message: string) => void) | undefined,
+        _sourceFiles: ReadonlyArray<ts.SourceFile>
     ) => {
         if (fileName === outputDtsFileName) {
             result.dtsOutput = data;
