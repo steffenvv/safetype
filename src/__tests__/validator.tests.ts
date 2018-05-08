@@ -76,12 +76,21 @@ describe("validation", () => {
         expect(() =>
             validateItem({ name: "", value: null, enabled: false, foo: "bar" })
         ).toThrowErrorMatchingSnapshot();
+        expect(() =>
+            validateItem({ name: "", value: null, enabled: true, subItems: [{ name: "sub", value: true, foo: "bar" }] })
+        ).toThrowErrorMatchingSnapshot();
     });
 
     it("allows extra properties if that option is set", () => {
         expect(
             validateItem({ name: "", value: null, enabled: false, foo: "bar" }, { allowExtraProperties: true })
         ).toHaveProperty("foo", "bar");
+        expect(
+            validateItem(
+                { name: "", value: null, enabled: true, subItems: [{ name: "sub", value: true, foo: "bar" }] },
+                { allowExtraProperties: true }
+            )
+        ).toHaveProperty("subItems.0.foo", "bar");
     });
 
     it("keeps undefined values when they are allowed", () => {
