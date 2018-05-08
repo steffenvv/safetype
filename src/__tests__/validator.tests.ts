@@ -78,6 +78,12 @@ describe("validation", () => {
         ).toThrowErrorMatchingSnapshot();
     });
 
+    it("allows extra properties if that option is set", () => {
+        expect(
+            validateItem({ name: "", value: null, enabled: false, foo: "bar" }, { allowExtraProperties: true })
+        ).toHaveProperty("foo", "bar");
+    });
+
     it("keeps undefined values when they are allowed", () => {
         expect(validateItem({ name: "", value: null, enabled: false, maybeUndefined: undefined })).toHaveProperty(
             "maybeUndefined"

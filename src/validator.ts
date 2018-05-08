@@ -10,9 +10,13 @@ export interface ValidationContext {
     typeName(value: any): string;
 }
 
+export interface ValidationOptions {
+    readonly allowExtraProperties?: boolean;
+}
+
 export interface Validator<T> {
-    validate(value: any, context?: ValidationContext): T;
-    isValid(value: any): value is T;
+    validate(value: any, options?: ValidationOptions, context?: ValidationContext): T;
+    isValid(value: any, options?: ValidationOptions): value is T;
     readonly orNull: Validator<T | null>;
     readonly orUndefined: Validator<T | undefined>;
     readonly array: Validator<ReadonlyArray<T>>;
@@ -64,15 +68,17 @@ export function makeContext(): ValidationContext {
     return context;
 }
 
-export function makeValidator<T>(validate: (value: any, context: ValidationContext) => T): Validator<T> {
+export function makeValidator<T>(
+    validate: (value: any, options: ValidationOptions, context: ValidationContext) => T
+): Validator<T> {
     return {
-        validate: (x, context = makeContext()) => {
-            return validate(x, context);
+        validate: (x, options = {}, context = makeContext()) => {
+            return validate(x, options, context);
         },
 
-        isValid: (x: any): x is T => {
+        isValid: (x: any, options = {}): x is T => {
             try {
-                validate(x, makeContext());
+                validate(x, options, makeContext());
                 return true;
             } catch {
                 return false;
@@ -80,27 +86,27 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
         },
 
         get orNull(): Validator<T | null> {
-            return makeValidator((x, context): T | null => {
+            return makeValidator((x, options, context): T | null => {
                 if (x === null) {
                     return null;
                 }
 
-                return validate(x, context);
+                return validate(x, options, context);
             });
         },
 
         get orUndefined(): Validator<T | undefined> {
-            return makeValidator((x, context): T | undefined => {
+            return makeValidator((x, options, context): T | undefined => {
                 if (x === undefined) {
                     return undefined;
                 }
 
-                return validate(x, context);
+                return validate(x, options, context);
             });
         },
 
         get array(): Validator<ReadonlyArray<T>> {
-            return makeValidator((x, context): ReadonlyArray<T> => {
+            return makeValidator((x, options, context): ReadonlyArray<T> => {
                 if (!Array.isArray(x)) {
                     return context.fail(`expected an array, not ${typeName(x)}`);
                 }
@@ -112,7 +118,7 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
                     context.path.pushKey(i.toString());
                     try {
                         const value = x[i];
-                        const validatedValue = validate(value, context);
+                        const validatedValue = validate(value, options, context);
                         result.push(validatedValue);
                         changed = changed || value !== validatedValue;
                     } finally {
@@ -126,11 +132,11 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
         },
 
         or<U>(otherValidator: Validator<U>): Validator<T | U> {
-            return makeValidator((x, context): T | U => {
+            return makeValidator((x, options, context): T | U => {
                 try {
-                    return validate(x, context);
+                    return validate(x, options, context);
                 } catch {
-                    return otherValidator.validate(x, context);
+                    return otherValidator.validate(x, options, context);
                 }
             });
         }
@@ -138,15 +144,16 @@ export function makeValidator<T>(validate: (value: any, context: ValidationConte
 }
 
 export const aString = makeValidator(
-    (x, context): string => (typeof x === "string" ? x : context.fail(`expected a string, not ${typeName(x)}`))
+    (x, options, context): string => (typeof x === "string" ? x : context.fail(`expected a string, not ${typeName(x)}`))
 );
 
 export const aBoolean = makeValidator(
-    (x, context): boolean => (typeof x === "boolean" ? x : context.fail(`expected a boolean, not ${typeName(x)}`))
+    (x, options, context): boolean =>
+        typeof x === "boolean" ? x : context.fail(`expected a boolean, not ${typeName(x)}`)
 );
 
 export const aNumber = makeValidator(
-    (x, context): number => (typeof x === "number" ? x : context.fail(`expected a number, not ${typeName(x)}`))
+    (x, options, context): number => (typeof x === "number" ? x : context.fail(`expected a number, not ${typeName(x)}`))
 );
 
 export type ThunkValidator<T> = Validator<T> | (() => Validator<T>);
@@ -172,7 +179,7 @@ export type Validated<T> = { readonly [K in keyof UndefinedToOptional<T>]: Undef
 export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>> {
     const validatorKeys = keys(validators);
 
-    return makeValidator((x, context): Validated<T> => {
+    return makeValidator((x, options, context): Validated<T> => {
         if (x === null || typeof x !== "object") {
             return context.fail(`expected an object, not ${typeName(x)}`);
         }
@@ -191,7 +198,7 @@ export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>
 
             context.path.pushKey(key);
             try {
-                const validatedValue = validate(value, context);
+                const validatedValue = validate(value, options, context);
                 if (validatedValue === undefined && !x.hasOwnProperty(key)) {
                     /* Don't introduce new keys for missing optional values. */
                 } else {
@@ -206,7 +213,12 @@ export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>
         /* Check for extra keys */
         for (const key of keys(x)) {
             if (typeof key === "string" && !validators.hasOwnProperty(key)) {
-                return context.fail(`unexpected property "${key}"`);
+                if (!options.allowExtraProperties) {
+                    return context.fail(`unexpected property "${key}"`);
+                } else {
+                    /* Preserve the extra property in the validated object. */
+                    result[key] = x[key];
+                }
             }
         }
 
@@ -222,7 +234,7 @@ export function aStringLiteral<T extends string>(value: T): Validator<T> {
 export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
     const expectedType = values.map(x => `"${x}"`).join(" | ");
 
-    return makeValidator((x, context) => {
+    return makeValidator((x, options, context) => {
         if (values.indexOf(x) === -1) {
             return context.fail(`expected ${expectedType}, not ${typeName(x)}`);
         }

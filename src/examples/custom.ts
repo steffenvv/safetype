@@ -6,7 +6,7 @@ class Hex {
     constructor(public readonly digits: string) {}
 }
 
-const aHexString = makeValidator((value, context) => {
+const aHexString = makeValidator((value, options, context) => {
     if (typeof value !== "string" || !value.match(/^[0-9A-Fa-f]+$/)) {
         return context.fail(`expected a string of hex digits, not ${context.typeName(value)}`);
     }
@@ -19,5 +19,5 @@ if (aHexString.isValid("Bad")) {
 }
 
 const aResponse = anObject({
-    data: aHexString.array.orNull /* Custom validators can be combined in the usual way */
+    data: aHexString.array.orNull
 });
