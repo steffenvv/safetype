@@ -68,6 +68,20 @@ export declare type T1 = InferType<typeof t1>;
 }
 `;
 
+exports[`type inference works correctly for unary functions 1`] = `
+Object {
+  "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
+export { Validated, Validator };
+export declare const parseInt: any;
+export declare type ParseInt = InferType<typeof parseInt>;
+",
+  "errors": Array [
+    "imaginarySourceFile.ts (3,10): Module '\\"D:/git/safetype/lib/index\\"' has no exported member 'aFunction'.",
+  ],
+  "jsOutput": "",
+}
+`;
+
 exports[`type inference works correctly for unions 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";

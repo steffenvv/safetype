@@ -148,21 +148,19 @@ describe("type inference", () => {
                      error: aString,
                      stackTrace: aString.orUndefined
                  })
-             );            
+             );
              export type Outcome = InferType<typeof anOutcome>;`
         ].join("\n");
         expect(compileModule(sourceCode)).toMatchSnapshot();
+    });
 
-        /* Inferred type:
-        type Outcome = {
-            readonly kind: "Success";
-            readonly data: ReadonlyArray<string>;
-            readonly timestamp: number;
-        } | {
-            readonly kind: "Error";
-            readonly error: string;
-            readonly stackTrace?: string | undefined;
-        }
-        */
+    it("works correctly for unary functions", () => {
+        const sourceCode = [
+            ...commonSourceCode,
+            `import { aFunction, aString, aNumber} from ".";
+             export const parseInt = aFunction.thatAccepts(aString).andReturns(aNumber);
+             export type ParseInt = InferType<typeof parseInt>;`
+        ].join("\n");
+        expect(compileModule(sourceCode)).toMatchSnapshot();
     });
 });

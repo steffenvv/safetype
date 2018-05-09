@@ -23,6 +23,16 @@ export interface Validator<T> {
     or<U>(otherValidator: Validator<U>): Validator<T | U>;
 }
 
+export interface AnyFunctionValidator extends Validator<Function> {
+    thatAccepts<A>(param1: Validator<A>): AnyFunctionValidator1<A>;
+}
+
+export interface AnyFunctionValidator1<A> extends Validator<(a: A) => any> {
+    andReturns<R>(result: Validator<R>): FunctionValidator1<A, R>;
+}
+
+export interface FunctionValidator1<A, R> extends Validator<(a: A) => R> {}
+
 export function keys<T>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
 }
@@ -108,7 +118,7 @@ export function makeValidator<T>(
         get array(): Validator<ReadonlyArray<T>> {
             return makeValidator((x, options, context): ReadonlyArray<T> => {
                 if (!Array.isArray(x)) {
-                    return context.fail(`expected an array, not ${typeName(x)}`);
+                    return context.fail(`expected an array, not ${context.typeName(x)}`);
                 }
 
                 const result: T[] = [];
@@ -144,16 +154,18 @@ export function makeValidator<T>(
 }
 
 export const aString = makeValidator(
-    (x, options, context): string => (typeof x === "string" ? x : context.fail(`expected a string, not ${typeName(x)}`))
+    (x, options, context): string =>
+        typeof x === "string" ? x : context.fail(`expected a string, not ${context.typeName(x)}`)
 );
 
 export const aBoolean = makeValidator(
     (x, options, context): boolean =>
-        typeof x === "boolean" ? x : context.fail(`expected a boolean, not ${typeName(x)}`)
+        typeof x === "boolean" ? x : context.fail(`expected a boolean, not ${context.typeName(x)}`)
 );
 
 export const aNumber = makeValidator(
-    (x, options, context): number => (typeof x === "number" ? x : context.fail(`expected a number, not ${typeName(x)}`))
+    (x, options, context): number =>
+        typeof x === "number" ? x : context.fail(`expected a number, not ${context.typeName(x)}`)
 );
 
 export type ThunkValidator<T> = Validator<T> | (() => Validator<T>);
@@ -181,7 +193,7 @@ export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>
 
     return makeValidator((x, options, context): Validated<T> => {
         if (x === null || typeof x !== "object") {
-            return context.fail(`expected an object, not ${typeName(x)}`);
+            return context.fail(`expected an object, not ${context.typeName(x)}`);
         }
 
         const result: any = {};
@@ -236,11 +248,29 @@ export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
 
     return makeValidator((x, options, context) => {
         if (values.indexOf(x) === -1) {
-            return context.fail(`expected ${expectedType}, not ${typeName(x)}`);
+            return context.fail(`expected ${expectedType}, not ${context.typeName(x)}`);
         }
 
         return x;
     });
+}
+
+export function aFunction(value: Function): AnyFunctionValidator {
+    const validator = makeValidator((x, options, context) => {
+        if (typeof x !== "function") {
+            return context.fail(`expected a function, not ${context.typeName(x)}`);
+        }
+
+        return x;
+    });
+
+    return {
+        ...validator,
+        thatAccepts: <A>(param1: Validator<A>): AnyFunctionValidator1<A> => {
+            return { ...validator,
+                andReturns;
+        }
+    }
 }
 
 export type InferType<T extends Validator<any>> = T extends Validator<infer U> ? U : never;
