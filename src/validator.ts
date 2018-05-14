@@ -255,7 +255,7 @@ export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
     });
 }
 
-export function aFunction(value: Function): AnyFunctionValidator {
+export const aFunction = ((): AnyFunctionValidator => {
     const validator = makeValidator((x, options, context) => {
         if (typeof x !== "function") {
             return context.fail(`expected a function, not ${context.typeName(x)}`);
@@ -267,10 +267,14 @@ export function aFunction(value: Function): AnyFunctionValidator {
     return {
         ...validator,
         thatAccepts: <A>(param1: Validator<A>): AnyFunctionValidator1<A> => {
-            return { ...validator,
-                andReturns;
+            return {
+                ...validator,
+                andReturns: <R>(result: Validator<R>): FunctionValidator1<A, R> => {
+                    return makeValidator(v => v);
+                }
+            };
         }
-    }
-}
+    };
+})();
 
 export type InferType<T extends Validator<any>> = T extends Validator<infer U> ? U : never;

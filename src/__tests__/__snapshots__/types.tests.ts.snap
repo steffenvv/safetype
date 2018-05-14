@@ -2,8 +2,7 @@
 
 exports[`type inference works correctly for basic types 1`] = `
 Object {
-  "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
-export { Validated, Validator };
+  "dtsOutput": "import { InferType, Validator } from \\".\\";
 export declare const t1: Validator<string>;
 export declare type T1 = InferType<typeof t1>;
 ",
@@ -15,7 +14,6 @@ export declare type T1 = InferType<typeof t1>;
 exports[`type inference works correctly for nested object types 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
-export { Validated, Validator };
 export declare const t1: Validator<Validated<{
     foo: ReadonlyArray<string | null> | null | undefined;
     bar: number | null;
@@ -39,7 +37,6 @@ export declare type T2 = InferType<typeof t2>;
 exports[`type inference works correctly for shallow object types 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
-export { Validated, Validator };
 export declare const t1: Validator<Validated<{
     foo: string;
     bar: number;
@@ -55,7 +52,6 @@ export declare type T1 = InferType<typeof t1>;
 exports[`type inference works correctly for shallow object types with arrays and optionals 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
-export { Validated, Validator };
 export declare const t1: Validator<Validated<{
     foo: ReadonlyArray<string | null> | null | undefined;
     bar: number | null;
@@ -70,14 +66,11 @@ export declare type T1 = InferType<typeof t1>;
 
 exports[`type inference works correctly for unary functions 1`] = `
 Object {
-  "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
-export { Validated, Validator };
-export declare const parseInt: any;
+  "dtsOutput": "import { InferType, FunctionValidator1 } from \\".\\";
+export declare const parseInt: FunctionValidator1<string, number>;
 export declare type ParseInt = InferType<typeof parseInt>;
 ",
-  "errors": Array [
-    "imaginarySourceFile.ts (3,10): Module '\\"D:/git/safetype/lib/index\\"' has no exported member 'aFunction'.",
-  ],
+  "errors": Array [],
   "jsOutput": "",
 }
 `;
@@ -85,7 +78,6 @@ export declare type ParseInt = InferType<typeof parseInt>;
 exports[`type inference works correctly for unions 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
-export { Validated, Validator };
 export declare const anOutcome: Validator<Validated<{
     kind: \\"Success\\";
     data: ReadonlyArray<string>;

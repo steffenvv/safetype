@@ -68,10 +68,7 @@ function compileModule(sourceCode: string): CompilationResult {
 }
 
 describe("type inference", () => {
-    const commonSourceCode = [
-        `import { InferType, Validated, Validator } from ".";`,
-        `export { Validated, Validator };`
-    ];
+    const commonSourceCode = [`import { InferType, Validated, Validator, FunctionValidator1 } from ".";`];
 
     it("works correctly for basic types", () => {
         const sourceCode = [
