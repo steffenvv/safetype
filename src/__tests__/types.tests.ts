@@ -68,7 +68,9 @@ function compileModule(sourceCode: string): CompilationResult {
 }
 
 describe("type inference", () => {
-    const commonSourceCode = [`import { InferType, Validated, Validator, FunctionValidator1 } from ".";`];
+    const commonSourceCode = [
+        `import { InferType, Validated, Validator, FunctionValidator1, FunctionValidator2, FunctionValidator3 } from ".";`
+    ];
 
     it("works correctly for basic types", () => {
         const sourceCode = [
@@ -154,9 +156,23 @@ describe("type inference", () => {
     it("works correctly for unary functions", () => {
         const sourceCode = [
             ...commonSourceCode,
-            `import { aFunction, aString, aNumber} from ".";
+            `import { aFunction, aString, aNumber } from ".";
              export const parseInt = aFunction.thatAccepts(aString).andReturns(aNumber);
              export type ParseInt = InferType<typeof parseInt>;`
+        ].join("\n");
+        expect(compileModule(sourceCode)).toMatchSnapshot();
+    });
+
+    it("works correctly for functions with higher arity", () => {
+        const sourceCode = [
+            ...commonSourceCode,
+            `import { aFunction, aString, aNumber, aBoolean, anObject } from ".";
+             export const parseAndSumInts = aFunction.thatAccepts(aString, aString).andReturns(aNumber);
+             export type ParseAndSumInts = InferType<typeof parseAndSumInts>;
+             
+             export const munge = aFunction.thatAccepts(anObject({ name : aString }), aNumber, aBoolean).andReturns(aBoolean.or(aString));
+             export type Munge = InferType<typeof munge>;
+             `
         ].join("\n");
         expect(compileModule(sourceCode)).toMatchSnapshot();
     });

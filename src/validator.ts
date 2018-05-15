@@ -24,14 +24,28 @@ export interface Validator<T> {
 }
 
 export interface AnyFunctionValidator extends Validator<Function> {
-    thatAccepts<A>(param1: Validator<A>): AnyFunctionValidator1<A>;
+    thatAccepts<A>(arg1: Validator<A>): AnyFunctionValidator1<A>;
+    thatAccepts<A, B>(arg1: Validator<A>, arg2: Validator<B>): AnyFunctionValidator2<A, B>;
+    thatAccepts<A, B, C>(arg1: Validator<A>, arg2: Validator<B>, arg3: Validator<C>): AnyFunctionValidator3<A, B, C>;
 }
 
 export interface AnyFunctionValidator1<A> extends Validator<(a: A) => any> {
     andReturns<R>(result: Validator<R>): FunctionValidator1<A, R>;
 }
 
+export interface AnyFunctionValidator2<A, B> extends Validator<(a: A, b: B) => any> {
+    andReturns<R>(result: Validator<R>): FunctionValidator2<A, B, R>;
+}
+
+export interface AnyFunctionValidator3<A, B, C> extends Validator<(a: A, b: B, c: C) => any> {
+    andReturns<R>(result: Validator<R>): FunctionValidator3<A, B, C, R>;
+}
+
 export interface FunctionValidator1<A, R> extends Validator<(a: A) => R> {}
+
+export interface FunctionValidator2<A, B, R> extends Validator<(a: A, b: B) => R> {}
+
+export interface FunctionValidator3<A, B, C, R> extends Validator<(a: A, b: B, c: C) => R> {}
 
 export function keys<T>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
@@ -255,22 +269,44 @@ export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
     });
 }
 
-export const aFunction = ((): AnyFunctionValidator => {
-    const validator = makeValidator((x, options, context) => {
+function plural(n: number, singular: string): string {
+    return n === 1 ? singular : singular + "s";
+}
+
+function makeFunctionValidator(
+    resultValidator: Validator<any>,
+    ...argumentValidators: Validator<any>[]
+): Validator<any> {
+    const argCount = argumentValidators.length;
+
+    return makeValidator((x, options, context) => {
         if (typeof x !== "function") {
             return context.fail(`expected a function, not ${context.typeName(x)}`);
         }
 
+        const f: Function = x;
+
+        if (f.length !== argCount) {
+            return context.fail(
+                `expected a function accepting ${plural(argCount, "argument")}, not ${context.typeName(x)}`
+            );
+        }
+
         return x;
     });
+}
+
+export const aFunction = ((): AnyFunctionValidator => {
+    const anyValidator = makeValidator(x => x);
+    const validator = makeFunctionValidator(anyValidator);
 
     return {
         ...validator,
-        thatAccepts: <A>(param1: Validator<A>): AnyFunctionValidator1<A> => {
+        thatAccepts: (...argumentValidators: Validator<any>[]) => {
             return {
                 ...validator,
-                andReturns: <R>(result: Validator<R>): FunctionValidator1<A, R> => {
-                    return makeValidator(v => v);
+                andReturns: (resultValidator: Validator<any>) => {
+                    return makeFunctionValidator(resultValidator, ...argumentValidators);
                 }
             };
         }

@@ -11,6 +11,21 @@ export declare type T1 = InferType<typeof t1>;
 }
 `;
 
+exports[`type inference works correctly for functions with higher arity 1`] = `
+Object {
+  "dtsOutput": "import { InferType, Validated, FunctionValidator2, FunctionValidator3 } from \\".\\";
+export declare const parseAndSumInts: FunctionValidator2<string, string, number>;
+export declare type ParseAndSumInts = InferType<typeof parseAndSumInts>;
+export declare const munge: FunctionValidator3<Validated<{
+    name: string;
+}>, number, boolean, string | boolean>;
+export declare type Munge = InferType<typeof munge>;
+",
+  "errors": Array [],
+  "jsOutput": "",
+}
+`;
+
 exports[`type inference works correctly for nested object types 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
