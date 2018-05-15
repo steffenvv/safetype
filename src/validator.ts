@@ -24,6 +24,7 @@ export interface Validator<T> {
 }
 
 export interface AnyFunctionValidator extends Validator<Function> {
+    thatReturns<R>(result: Validator<R>): FunctionValidator0<R>;
     thatAccepts<A>(arg1: Validator<A>): AnyFunctionValidator1<A>;
     thatAccepts<A, B>(arg1: Validator<A>, arg2: Validator<B>): AnyFunctionValidator2<A, B>;
     thatAccepts<A, B, C>(arg1: Validator<A>, arg2: Validator<B>, arg3: Validator<C>): AnyFunctionValidator3<A, B, C>;
@@ -40,6 +41,8 @@ export interface AnyFunctionValidator2<A, B> extends Validator<(a: A, b: B) => a
 export interface AnyFunctionValidator3<A, B, C> extends Validator<(a: A, b: B, c: C) => any> {
     andReturns<R>(result: Validator<R>): FunctionValidator3<A, B, C, R>;
 }
+
+export interface FunctionValidator0<R> extends Validator<() => R> {}
 
 export interface FunctionValidator1<A, R> extends Validator<(a: A) => R> {}
 
@@ -302,7 +305,11 @@ export const aFunction = ((): AnyFunctionValidator => {
 
     return {
         ...validator,
+        thatReturns: (resultValidator: Validator<any>) => {
+            return makeFunctionValidator(resultValidator);
+        },
         thatAccepts: (...argumentValidators: Validator<any>[]) => {
+            const validator = makeFunctionValidator(anyValidator, ...argumentValidators);
             return {
                 ...validator,
                 andReturns: (resultValidator: Validator<any>) => {

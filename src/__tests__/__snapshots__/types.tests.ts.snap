@@ -49,6 +49,17 @@ export declare type T2 = InferType<typeof t2>;
 }
 `;
 
+exports[`type inference works correctly for nullary functions 1`] = `
+Object {
+  "dtsOutput": "import { InferType, FunctionValidator0 } from \\".\\";
+export declare const getInt: FunctionValidator0<number>;
+export declare type GetInt = InferType<typeof getInt>;
+",
+  "errors": Array [],
+  "jsOutput": "",
+}
+`;
+
 exports[`type inference works correctly for shallow object types 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";

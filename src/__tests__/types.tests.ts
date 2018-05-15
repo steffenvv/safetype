@@ -69,7 +69,7 @@ function compileModule(sourceCode: string): CompilationResult {
 
 describe("type inference", () => {
     const commonSourceCode = [
-        `import { InferType, Validated, Validator, FunctionValidator1, FunctionValidator2, FunctionValidator3 } from ".";`
+        `import { InferType, Validated, Validator, FunctionValidator0, FunctionValidator1, FunctionValidator2, FunctionValidator3 } from ".";`
     ];
 
     it("works correctly for basic types", () => {
@@ -149,6 +149,16 @@ describe("type inference", () => {
                  })
              );
              export type Outcome = InferType<typeof anOutcome>;`
+        ].join("\n");
+        expect(compileModule(sourceCode)).toMatchSnapshot();
+    });
+
+    it("works correctly for nullary functions", () => {
+        const sourceCode = [
+            ...commonSourceCode,
+            `import { aFunction, aNumber } from ".";
+             export const getInt = aFunction.thatReturns(aNumber);
+             export type GetInt = InferType<typeof getInt>;`
         ].join("\n");
         expect(compileModule(sourceCode)).toMatchSnapshot();
     });
