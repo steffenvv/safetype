@@ -36,6 +36,12 @@ Object {
 }
 `;
 
+exports[`validation of functions checks the number of arguments 1`] = `"Validation error: expected a function accepting 0 arguments, not a function accepting 1 argument"`;
+
+exports[`validation of functions checks the number of arguments 2`] = `"Validation error: expected a function accepting 1 argument, not a function accepting 2 arguments"`;
+
+exports[`validation of functions checks the number of arguments 3`] = `"Validation error: expected a function accepting 2 arguments, not a function accepting 0 arguments"`;
+
 exports[`validation works as a type guard 1`] = `
 Object {
   "valid": false,

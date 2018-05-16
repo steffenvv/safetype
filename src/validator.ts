@@ -63,6 +63,8 @@ function typeName(x: any): string {
         return "an array";
     } else if (typeof x === "object") {
         return "an object";
+    } else if (typeof x === "function") {
+        return `a function accepting ${plural(x.length, "argument")}`;
     } else {
         return `a ${typeof x}`;
     }
@@ -273,7 +275,7 @@ export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
 }
 
 function plural(n: number, singular: string): string {
-    return n === 1 ? singular : singular + "s";
+    return `${n} ${singular}${n === 1 ? "" : "s"}`;
 }
 
 function makeFunctionValidator(
@@ -301,7 +303,14 @@ function makeFunctionValidator(
 
 export const aFunction = ((): AnyFunctionValidator => {
     const anyValidator = makeValidator(x => x);
-    const validator = makeFunctionValidator(anyValidator);
+
+    const validator = makeValidator((x, options, context) => {
+        if (typeof x !== "function") {
+            return context.fail(`expected a function, not ${context.typeName(x)}`);
+        }
+
+        return x;
+    });
 
     return {
         ...validator,

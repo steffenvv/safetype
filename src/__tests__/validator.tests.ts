@@ -1,4 +1,4 @@
-import { Validator, aBoolean, aNumber, aString, aStringUnion, anObject } from "../validator";
+import { Validator, aBoolean, aNumber, aString, aStringUnion, anObject, aFunction } from "../validator";
 
 interface Item {
     readonly kind?: "A" | "B" | "C";
@@ -152,5 +152,32 @@ describe("validation", () => {
         expect(() => union.validate(["42"])).toThrowErrorMatchingSnapshot();
         expect(() => union.validate(null)).toThrowErrorMatchingSnapshot();
         expect(() => union.validate(undefined)).toThrowErrorMatchingSnapshot();
+    });
+
+    describe("of functions", () => {
+        it("checks the number of arguments", () => {
+            const a = aFunction;
+            const b = aFunction.thatReturns(aString);
+            const c = aFunction.thatAccepts(aBoolean).andReturns(aString);
+            const d = aFunction.thatAccepts(aBoolean, aNumber).andReturns(aString);
+
+            const f0 = () => undefined;
+            const f1 = (a: any) => undefined;
+            const f2 = (a: any, b: any) => undefined;
+            const f3 = (a: any, b: any, c: any) => undefined;
+            const fn = (...args: any[]) => undefined;
+
+            for (const f of [f0, f1, f2, f3, fn]) {
+                expect(a.validate(f)).toBe(f);
+            }
+
+            expect(b.validate(f0)).toBe(f0);
+            expect(c.validate(f1)).toBe(f1);
+            expect(d.validate(f2)).toBe(f2);
+
+            expect(() => b.validate(f1)).toThrowErrorMatchingSnapshot();
+            expect(() => c.validate(f2)).toThrowErrorMatchingSnapshot();
+            expect(() => d.validate(f0)).toThrowErrorMatchingSnapshot();
+        });
     });
 });
