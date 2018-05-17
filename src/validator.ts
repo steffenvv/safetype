@@ -50,8 +50,12 @@ export interface FunctionValidator2<A, B, R> extends Validator<(a: A, b: B) => R
 
 export interface FunctionValidator3<A, B, C, R> extends Validator<(a: A, b: B, c: C) => R> {}
 
-export function keys<T>(obj: T): (keyof T)[] {
+function keys<T>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
+}
+
+function plural(n: number, singular: string): string {
+    return `${n} ${singular}${n === 1 ? "" : "s"}`;
 }
 
 function typeName(x: any): string {
@@ -272,10 +276,6 @@ export function aStringUnion<T extends string>(...values: T[]): Validator<T> {
 
         return x;
     });
-}
-
-function plural(n: number, singular: string): string {
-    return `${n} ${singular}${n === 1 ? "" : "s"}`;
 }
 
 function makeFunctionValidator(
