@@ -41,7 +41,7 @@ function compileModule(sourceCode: string): CompilationResult {
         data: string,
         _writeByteOrderMark: boolean,
         _onError: ((message: string) => void) | undefined,
-        _sourceFiles: ReadonlyArray<ts.SourceFile>
+        _sourceFiles?: ReadonlyArray<ts.SourceFile>
     ) => {
         if (fileName === outputDtsFileName) {
             result.dtsOutput = data;
@@ -148,7 +148,7 @@ describe("type inference", () => {
                      error: aString,
                      stackTrace: aString.orUndefined
                  })
-             );            
+             );
              export type Outcome = InferType<typeof anOutcome>;`
         ].join("\n");
         expect(compileModule(sourceCode)).toMatchSnapshot();
