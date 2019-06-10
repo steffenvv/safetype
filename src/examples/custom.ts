@@ -1,5 +1,7 @@
 import { makeValidator, anObject } from "..";
 
+declare function log(message: string): void;
+
 // Custom validator example
 
 class Hex {
@@ -15,7 +17,7 @@ const aHexString = makeValidator((value, options, context) => {
 });
 
 if (aHexString.isValid("Bad")) {
-    console.log("Good!");
+    log("Good!");
 }
 
 const aResponse = anObject({

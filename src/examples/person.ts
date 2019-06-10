@@ -1,5 +1,7 @@
 import { InferType, aString, aStringUnion, anObject } from "..";
 
+declare function log(message: string): void;
+
 // Person example
 
 const aPhone = anObject({
@@ -26,5 +28,5 @@ const q = JSON.parse(JSON.stringify(p));
 
 if (aPerson.isValid(q)) {
     /* Validates that q is a Person and narrows its type from any to Person. */
-    console.log(`Hello, ${q.name}`);
+    log(`Hello, ${q.name}`);
 }

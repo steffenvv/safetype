@@ -15,6 +15,7 @@ function compileModule(sourceCode: string): CompilationResult {
     const options: ts.CompilerOptions = {
         declaration: true,
         strict: true,
+        lib: ["lib.es5.d.ts", "lib.es2015.collection.d.ts"],
         baseUrl: "..",
         emitDeclarationOnly: true
     };

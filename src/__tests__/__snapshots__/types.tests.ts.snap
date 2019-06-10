@@ -17,7 +17,7 @@ Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
 export { Validated, Validator };
 export declare const t1: Validator<Validated<{
-    foo: ReadonlyArray<string | null> | null | undefined;
+    foo: readonly (string | null)[] | null | undefined;
     bar: number | null;
     baz: boolean | undefined;
 }>>;
@@ -57,7 +57,7 @@ Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
 export { Validated, Validator };
 export declare const t1: Validator<Validated<{
-    foo: ReadonlyArray<string | null> | null | undefined;
+    foo: readonly (string | null)[] | null | undefined;
     bar: number | null;
     baz: boolean | undefined;
 }>>;
@@ -74,7 +74,7 @@ Object {
 export { Validated, Validator };
 export declare const anOutcome: Validator<Validated<{
     kind: \\"Success\\";
-    data: ReadonlyArray<string>;
+    data: readonly string[];
     timestamp: number;
 }> | Validated<{
     kind: \\"Error\\";

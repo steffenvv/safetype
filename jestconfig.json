@@ -1,6 +1,6 @@
 {
     "transform": {
-        "\\.tsx?": "ts-jest"
+        "^.+\\.tsx?$": "ts-jest"
     },
     "moduleFileExtensions": ["ts", "tsx", "js", "jsx"],
     "testRegex": "\\.tests?\\.tsx?$",
@@ -10,7 +10,7 @@
     "transformIgnorePatterns": ["node_modules"],
     "globals": {
         "ts-jest": {
-            "tsConfigFile": "tsconfig.json"
+            "tsConfig": "tsconfig.json"
         }
     }
 }
