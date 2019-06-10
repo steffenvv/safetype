@@ -1,10 +1,10 @@
-# safetype
+# inferred
 
-This is a typescript library for typesafe creation of validation functions and
-type guards. The key idea is to write your validation code as the source of
-truth, and infer your model types from the validation code. This ensures that
-the two are always in sync; it's not possible to change the model type and
-forget to update the validation code.
+This is a typescript library for safe and convenient creation of validation
+functions and type guards. The key idea is to write your validation code as the
+source of truth, and _infer_ your model types from the validation code. This
+ensures that the two are always in sync; it's not possible to change the model
+type and forget to update the validation code.
 
 Your model types are described by declaring _validators_ using a fluent
 interface:

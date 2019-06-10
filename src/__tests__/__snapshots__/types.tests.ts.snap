@@ -30,7 +30,7 @@ exports[`type inference works correctly for nested object types 1`] = `
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
 export declare const t1: Validator<Validated<{
-    foo: ReadonlyArray<string | null> | null | undefined;
+    foo: readonly (string | null)[] | null | undefined;
     bar: number | null;
     baz: boolean | undefined;
 }>>;
@@ -79,7 +79,7 @@ exports[`type inference works correctly for shallow object types with arrays and
 Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
 export declare const t1: Validator<Validated<{
-    foo: ReadonlyArray<string | null> | null | undefined;
+    foo: readonly (string | null)[] | null | undefined;
     bar: number | null;
     baz: boolean | undefined;
 }>>;
@@ -106,7 +106,7 @@ Object {
   "dtsOutput": "import { InferType, Validated, Validator } from \\".\\";
 export declare const anOutcome: Validator<Validated<{
     kind: \\"Success\\";
-    data: ReadonlyArray<string>;
+    data: readonly string[];
     timestamp: number;
 }> | Validated<{
     kind: \\"Error\\";

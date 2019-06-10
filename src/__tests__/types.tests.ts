@@ -15,6 +15,7 @@ function compileModule(sourceCode: string): CompilationResult {
     const options: ts.CompilerOptions = {
         declaration: true,
         strict: true,
+        lib: ["lib.es5.d.ts", "lib.es2015.collection.d.ts"],
         baseUrl: "..",
         emitDeclarationOnly: true
     };
@@ -41,7 +42,7 @@ function compileModule(sourceCode: string): CompilationResult {
         data: string,
         _writeByteOrderMark: boolean,
         _onError: ((message: string) => void) | undefined,
-        _sourceFiles: ReadonlyArray<ts.SourceFile>
+        _sourceFiles?: ReadonlyArray<ts.SourceFile>
     ) => {
         if (fileName === outputDtsFileName) {
             result.dtsOutput = data;

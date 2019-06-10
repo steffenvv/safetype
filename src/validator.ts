@@ -50,7 +50,7 @@ export interface FunctionValidator2<A, B, R> extends Validator<(a: A, b: B) => R
 
 export interface FunctionValidator3<A, B, C, R> extends Validator<(a: A, b: B, c: C) => R> {}
 
-function keys<T>(obj: T): (keyof T)[] {
+export function keys<T extends {}>(obj: T): (keyof T)[] {
     return Object.keys(obj) as (keyof T)[];
 }
 
@@ -119,59 +119,67 @@ export function makeValidator<T>(
         },
 
         get orNull(): Validator<T | null> {
-            return makeValidator((x, options, context): T | null => {
-                if (x === null) {
-                    return null;
-                }
+            return makeValidator(
+                (x, options, context): T | null => {
+                    if (x === null) {
+                        return null;
+                    }
 
-                return validate(x, options, context);
-            });
+                    return validate(x, options, context);
+                }
+            );
         },
 
         get orUndefined(): Validator<T | undefined> {
-            return makeValidator((x, options, context): T | undefined => {
-                if (x === undefined) {
-                    return undefined;
-                }
+            return makeValidator(
+                (x, options, context): T | undefined => {
+                    if (x === undefined) {
+                        return undefined;
+                    }
 
-                return validate(x, options, context);
-            });
+                    return validate(x, options, context);
+                }
+            );
         },
 
         get array(): Validator<ReadonlyArray<T>> {
-            return makeValidator((x, options, context): ReadonlyArray<T> => {
-                if (!Array.isArray(x)) {
-                    return context.fail(`expected an array, not ${context.typeName(x)}`);
-                }
-
-                const result: T[] = [];
-                let changed = false;
-
-                for (let i = 0; i < x.length; i++) {
-                    context.path.pushKey(i.toString());
-                    try {
-                        const value = x[i];
-                        const validatedValue = validate(value, options, context);
-                        result.push(validatedValue);
-                        changed = changed || value !== validatedValue;
-                    } finally {
-                        context.path.popKey();
+            return makeValidator(
+                (x, options, context): ReadonlyArray<T> => {
+                    if (!Array.isArray(x)) {
+                        return context.fail(`expected an array, not ${context.typeName(x)}`);
                     }
-                }
 
-                /* Preserve the object identity if nothing changed. */
-                return changed ? result : x;
-            });
+                    const result: T[] = [];
+                    let changed = false;
+
+                    for (let i = 0; i < x.length; i++) {
+                        context.path.pushKey(i.toString());
+                        try {
+                            const value = x[i];
+                            const validatedValue = validate(value, options, context);
+                            result.push(validatedValue);
+                            changed = changed || value !== validatedValue;
+                        } finally {
+                            context.path.popKey();
+                        }
+                    }
+
+                    /* Preserve the object identity if nothing changed. */
+                    return changed ? result : x;
+                }
+            );
         },
 
         or<U>(otherValidator: Validator<U>): Validator<T | U> {
-            return makeValidator((x, options, context): T | U => {
-                try {
-                    return validate(x, options, context);
-                } catch {
-                    return otherValidator.validate(x, options, context);
+            return makeValidator(
+                (x, options, context): T | U => {
+                    try {
+                        return validate(x, options, context);
+                    } catch {
+                        return otherValidator.validate(x, options, context);
+                    }
                 }
-            });
+            );
         }
     };
 }
@@ -214,52 +222,54 @@ export type Validated<T> = { readonly [K in keyof UndefinedToOptional<T>]: Undef
 export function anObject<T>(validators: ValidatorMap<T>): Validator<Validated<T>> {
     const validatorKeys = keys(validators);
 
-    return makeValidator((x, options, context): Validated<T> => {
-        if (x === null || typeof x !== "object") {
-            return context.fail(`expected an object, not ${context.typeName(x)}`);
-        }
-
-        const result: any = {};
-        let changed = false;
-
-        for (const key of validatorKeys) {
-            if (typeof key !== "string") {
-                continue;
+    return makeValidator(
+        (x, options, context): Validated<T> => {
+            if (x === null || typeof x !== "object") {
+                return context.fail(`expected an object, not ${context.typeName(x)}`);
             }
 
-            const value = x[key];
-            const validator: ThunkValidator<any> = validators[key];
-            const validate = typeof validator === "function" ? validator().validate : validator.validate;
+            const result: any = {};
+            let changed = false;
 
-            context.path.pushKey(key);
-            try {
-                const validatedValue = validate(value, options, context);
-                if (validatedValue === undefined && !x.hasOwnProperty(key)) {
-                    /* Don't introduce new keys for missing optional values. */
-                } else {
-                    result[key] = validatedValue;
-                    changed = changed || validatedValue !== value;
+            for (const key of validatorKeys) {
+                if (typeof key !== "string") {
+                    continue;
                 }
-            } finally {
-                context.path.popKey();
-            }
-        }
 
-        /* Check for extra keys */
-        for (const key of keys(x)) {
-            if (typeof key === "string" && !validators.hasOwnProperty(key)) {
-                if (!options.allowExtraProperties) {
-                    return context.fail(`unexpected property "${key}"`);
-                } else {
-                    /* Preserve the extra property in the validated object. */
-                    result[key] = x[key];
+                const value = x[key];
+                const validator: ThunkValidator<any> = validators[key];
+                const validate = typeof validator === "function" ? validator().validate : validator.validate;
+
+                context.path.pushKey(key);
+                try {
+                    const validatedValue = validate(value, options, context);
+                    if (validatedValue === undefined && !x.hasOwnProperty(key)) {
+                        /* Don't introduce new keys for missing optional values. */
+                    } else {
+                        result[key] = validatedValue;
+                        changed = changed || validatedValue !== value;
+                    }
+                } finally {
+                    context.path.popKey();
                 }
             }
-        }
 
-        /* Preserve the object identity if nothing changed. */
-        return changed ? result : x;
-    });
+            /* Check for extra keys */
+            for (const key of keys(x)) {
+                if (typeof key === "string" && !validators.hasOwnProperty(key)) {
+                    if (!options.allowExtraProperties) {
+                        return context.fail(`unexpected property "${key}"`);
+                    } else {
+                        /* Preserve the extra property in the validated object. */
+                        result[key] = x[key];
+                    }
+                }
+            }
+
+            /* Preserve the object identity if nothing changed. */
+            return changed ? result : x;
+        }
+    );
 }
 
 export function aStringLiteral<T extends string>(value: T): Validator<T> {
